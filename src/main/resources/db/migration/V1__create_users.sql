@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- BCrypt hash da senha "123456" (gerado com fator de custo padrão 10)
--- $2a$10$Dow1H3KO/qyH4x6Yy7Al.eQ1ytY1/6aeXOvNhbbX6YsJhBKt3vnx2
+-- $2a$10$Ddirow1H3KO/qyH4x6Yy7Al.eQ1ytY1/6aeXOvNhbbX6YsJhBKt3vnx2
 -- Podemos usar a mesma hash para todos os usuários seed.
 
 INSERT INTO users (id, nome, email, senha, birthday, address, phone_number, created_at, updated_at, ativo) VALUES
