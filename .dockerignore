@@ -1,0 +1,10 @@
+target
+api/target
+.mvn
+.git
+.gitignore
+Dockerfile
+node_modules
+.env
+**/.env
+**/*.log
