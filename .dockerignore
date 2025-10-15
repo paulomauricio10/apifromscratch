@@ -3,7 +3,7 @@ api/target
 .mvn
 .git
 .gitignore
-Dockerfile
+# Mantemos Dockerfile para que o build possa encontrá-lo
 node_modules
 .env
 **/.env

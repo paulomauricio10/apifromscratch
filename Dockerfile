@@ -1,18 +1,16 @@
-# Multi-stage build para Spring Boot
-FROM eclipse-temurin:21-jdk AS build
+# Etapa de build usando imagem Maven (simples)
+FROM maven:3.9.9-eclipse-temurin-21 AS build
 WORKDIR /app
-COPY api/pom.xml ./api/pom.xml
-COPY api/mvnw api/mvnw.cmd ./api/
-COPY api/.mvn ./api/.mvn
-RUN --mount=type=cache,target=/root/.m2 \
-    cd api && ./mvnw -q dependency:go-offline
-COPY api ./api
-RUN --mount=type=cache,target=/root/.m2 cd api && ./mvnw -q -DskipTests package
+COPY pom.xml .
+# Baixa dependências em cache
+RUN mvn -q -DskipTests dependency:go-offline
+COPY src ./src
+RUN mvn -q -DskipTests package
 
-FROM eclipse-temurin:21-jre AS runtime
+# Etapa de runtime minimalista
+FROM eclipse-temurin:21-jre
 WORKDIR /app
-# Copiar jar gerado
-COPY --from=build /app/api/target/api-*.jar app.jar
+COPY --from=build /app/target/api-*.jar app.jar
 EXPOSE 8080
 ENV JAVA_OPTS=""
 ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar app.jar"]
