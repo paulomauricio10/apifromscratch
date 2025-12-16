@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserRequest> getById(@PathVariable UUID id) {
+    public ResponseEntity<UserRequest> getById(@PathVariable String id) {
         UserRequest dto = userService.getById(id);
         return dto == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(dto);
     }
@@ -45,13 +45,13 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserRequest> update(@PathVariable UUID id, @RequestBody UserRequest request) {
+    public ResponseEntity<UserRequest> update(@PathVariable String id, @RequestBody UserRequest request) {
         UserRequest updated = userService.update(id, request);
         return updated == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+    public ResponseEntity<Void> delete(@PathVariable String id) {
         boolean deleted = userService.delete(id);
         return deleted ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
     }

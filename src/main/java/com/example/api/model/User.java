@@ -10,15 +10,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -31,35 +25,24 @@ import jakarta.validation.constraints.Size;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
-    private String username;
+    private String id;
 
     @NotBlank
     @Size(max = 120)
     @Column(nullable = false, length = 120)
-    private String nome;
+    private String name;
 
     @NotBlank
     @Email
     @Size(max = 180)
-    @Column(nullable = false, length = 180)
+    @Column(nullable = false, length = 180, unique = true)
     private String email;
 
+    @JsonIgnore
     @NotBlank
     @Size(min = 6, max = 255)
     @Column(nullable = false, length = 255)
     private String password; // Armazenar hash (ex: BCrypt) e nunca a senha em texto puro
-
-    @Column(nullable = false, updatable = false)
-    private Instant createdAt;
-
-    @Column(nullable = false)
-    private Instant updatedAt;
-
-    @Column(nullable = false)
-    private boolean ativo = true;
 
     // Novos campos
     @Column(name = "birthday")
@@ -74,6 +57,26 @@ public class User implements UserDetails {
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private Instant createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
+
+    @Transient
+    private String token;
+
+    /*
+     * @JoinTable(name = "usuarios_perfis",
+     * joinColumns = @JoinColumn(name = "usuario_id"),
+     * inverseJoinColumns = @JoinColumn(name = "perfil_id"))
+     * private List<Perfil> perfis = new ArrayList<>();
+     * 
+     */
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
@@ -84,6 +87,12 @@ public class User implements UserDetails {
         Instant now = Instant.now();
         this.createdAt = now;
         this.updatedAt = now;
+
+        //Para manter o formato de UUID depois que alterei o campo MySQL de binary para char(32), pois deu problema com o WebFlux
+        if (this.id == null || this.id.isBlank()) {
+            this.id = java.util.UUID.randomUUID().toString(); // 32 chars
+        }
+
     }
 
     @PreUpdate
@@ -92,28 +101,25 @@ public class User implements UserDetails {
     }
 
     // Getters e Setters
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public String getUsername() {
-        return username;
+        return email;
     }
 
-    public void setUsername(String login) {
-        this.username = login;
+    public String getName() {
+        return name;
     }
 
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getEmail() {
@@ -124,6 +130,7 @@ public class User implements UserDetails {
         this.email = email;
     }
 
+    @Override
     public String getPassword() {
         return password;
     }
@@ -140,12 +147,12 @@ public class User implements UserDetails {
         return updatedAt;
     }
 
-    public boolean isAtivo() {
-        return ativo;
+    public boolean isActive() {
+        return this.isActive;
     }
 
-    public void setAtivo(boolean ativo) {
-        this.ativo = ativo;
+    public void setActive(boolean ativo) {
+        this.isActive = ativo;
     }
 
     public LocalDate getBirthday() {
@@ -189,6 +196,17 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isActive();
     }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+
+
 }

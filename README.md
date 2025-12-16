@@ -3,7 +3,7 @@ API de usuários do zero
 
 ## Docker / Compose
 
-1. (Opcional) Copie `.env.example` para `.env` e ajuste credenciais.
+1. Ajuste `.env` definindo as credenciais.
 2. Suba os serviços:
 
 ```powershell
@@ -26,7 +26,7 @@ docker compose down
 
 Volume persistente: `mysql_data`.
 
-## Variáveis de Ambiente Principais
+## Variáveis de Ambiente Principais (defindas no .env)
 - MYSQL_HOST
 - MYSQL_PORT
 - MYSQL_DB

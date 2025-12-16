@@ -1,9 +1,12 @@
 package com.example.api.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +32,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public UserRequest getById(UUID id) {
+    public UserRequest getById(String id) {
         return userRepository.findById(id)
                 .map(this::toDto)
                 .orElse(null);
@@ -38,7 +41,7 @@ public class UserService {
     @Transactional
     public UserRequest create(UserRequest req, String senhaHash) {
         User user = new User();
-        user.setNome(req.nome());
+        user.setName(req.name());
         user.setEmail(req.email());
         user.setPassword(senhaHash); // A senha deve ser hash (ex: BCrypt)
         user.setBirthday(req.birthday());
@@ -49,10 +52,10 @@ public class UserService {
     }
 
     @Transactional
-    public UserRequest update(UUID id, UserRequest req) {
+    public UserRequest update(String id, UserRequest req) {
         return userRepository.findById(id)
                 .map(existing -> {
-                    existing.setNome(req.nome());
+                    existing.setName(req.name());
                     existing.setEmail(req.email());
                     existing.setBirthday(req.birthday());
                     existing.setAddress(req.address());
@@ -63,7 +66,7 @@ public class UserService {
     }
 
     @Transactional
-    public boolean delete(UUID id) {
+    public boolean delete(String id) {
         if (!userRepository.existsById(id))
             return false;
         userRepository.deleteById(id);
@@ -73,7 +76,8 @@ public class UserService {
     private UserRequest toDto(User u) {
         return new UserRequest(
                 u.getId(),
-                u.getNome(),
+                u.getUsername(),
+                u.getName(),
                 u.getEmail(),
                 u.getBirthday(),
                 u.getAddress(),
