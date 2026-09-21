@@ -1,5 +1,6 @@
 package com.example.api;
 
+//nada demais 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
